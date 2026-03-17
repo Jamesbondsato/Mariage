@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Se connecter — MonMariagePerfait.fr</title>
+  <meta name="description" content="Connectez-vous à votre espace de planification de mariage.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="https://monmariageparfait.fr/pages/connexion.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #C8A96E; --gold-light: #E2C98A; --gold-dark: #9B7E4A;
+      --cream: #FAF7F2; --cream-dark: #F0EAE0; --ink: #1A1612;
+      --ink-soft: #3D3530; --ink-muted: #6B5E56; --white: #FFFFFF;
+      --shadow: 0 4px 32px rgba(26,22,18,0.08);
+      --radius: 4px; --radius-lg: 12px; --border: 1px solid rgba(200,169,110,0.2);
+      --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Jost', 'Helvetica Neue', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-sans); background: var(--cream); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+
+    nav { background: var(--white); border-bottom: var(--border); padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { font-family: var(--font-serif); font-size: 1.4rem; font-weight: 400; color: var(--ink); text-decoration: none; }
+    .nav-logo span { color: var(--gold-dark); font-style: italic; }
+    .nav-back { font-size: 0.85rem; color: var(--ink-muted); text-decoration: none; transition: color var(--transition); }
+    .nav-back:hover { color: var(--gold-dark); }
+
+    main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 48px 24px; }
+
+    .login-container { width: 100%; max-width: 440px; }
+
+    .login-header { text-align: center; margin-bottom: 40px; }
+    .login-emblem { font-size: 2rem; margin-bottom: 16px; }
+    .login-header h1 { font-family: var(--font-serif); font-size: 2.2rem; font-weight: 300; color: var(--ink); margin-bottom: 8px; }
+    .login-header h1 em { font-style: italic; color: var(--gold-dark); }
+    .login-header p { font-size: 0.9rem; color: var(--ink-muted); }
+    .login-header p a { color: var(--gold-dark); text-decoration: underline; text-underline-offset: 3px; }
+
+    .login-card { background: var(--white); border-radius: var(--radius-lg); padding: 40px; box-shadow: var(--shadow); border: var(--border); }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 7px; }
+    .form-group input { width: 100%; padding: 13px 16px; background: var(--cream); border: 1.5px solid var(--cream-dark); border-radius: var(--radius); font-family: var(--font-sans); font-size: 0.92rem; color: var(--ink); transition: border-color var(--transition); outline: none; }
+    .form-group input:focus { border-color: var(--gold); background: var(--white); }
+    .form-group input.error { border-color: #C25B5B; }
+    .form-error { font-size: 0.75rem; color: #C25B5B; margin-top: 4px; display: none; }
+    .form-error.show { display: block; }
+    .password-wrapper { position: relative; }
+    .password-wrapper input { padding-right: 44px; }
+    .toggle-pw { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--ink-muted); font-size: 1rem; padding: 4px; }
+
+    .form-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .remember-me { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--ink-muted); cursor: pointer; }
+    .remember-me input { accent-color: var(--gold-dark); }
+    .forgot-link { font-size: 0.82rem; color: var(--gold-dark); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; background: none; border: none; font-family: var(--font-sans); }
+
+    .btn-login { width: 100%; padding: 15px; background: var(--gold-dark); color: var(--white); border: none; border-radius: var(--radius); font-family: var(--font-sans); font-size: 0.95rem; font-weight: 500; letter-spacing: 0.05em; cursor: pointer; transition: all var(--transition); }
+    .btn-login:hover { background: var(--ink); transform: translateY(-1px); }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .security-note { display: flex; align-items: center; gap: 7px; justify-content: center; margin-top: 16px; font-size: 0.77rem; color: var(--ink-muted); }
+
+    .divider { display: flex; align-items: center; gap: 14px; margin: 24px 0; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--cream-dark); }
+    .divider span { font-size: 0.78rem; color: var(--ink-muted); white-space: nowrap; }
+
+    .register-cta { text-align: center; padding: 20px; background: rgba(200,169,110,0.06); border: var(--border); border-radius: var(--radius-lg); margin-top: 24px; }
+    .register-cta p { font-size: 0.88rem; color: var(--ink-muted); margin-bottom: 12px; }
+    .btn-register { display: inline-block; padding: 10px 28px; border: 1.5px solid var(--gold-dark); color: var(--gold-dark); border-radius: var(--radius); font-size: 0.88rem; font-weight: 500; text-decoration: none; transition: all var(--transition); }
+    .btn-register:hover { background: var(--gold-dark); color: var(--white); }
+
+    /* FORGOT PASSWORD PANEL */
+    .forgot-panel { display: none; }
+    .forgot-panel.visible { display: block; }
+    .login-panel.hidden { display: none; }
+    .back-btn { display: flex; align-items: center; gap: 6px; background: none; border: none; font-family: var(--font-sans); font-size: 0.85rem; color: var(--ink-muted); cursor: pointer; margin-bottom: 20px; padding: 0; transition: color var(--transition); }
+    .back-btn:hover { color: var(--gold-dark); }
+
+    /* ALERT */
+    .alert { padding: 12px 16px; border-radius: var(--radius); font-size: 0.85rem; margin-bottom: 20px; display: none; }
+    .alert.show { display: block; }
+    .alert.error { background: rgba(194,91,91,0.1); color: #8B2222; border: 1px solid rgba(194,91,91,0.3); }
+    .alert.success { background: rgba(74,140,110,0.1); color: #2E6B50; border: 1px solid rgba(74,140,110,0.3); }
+
+    footer { text-align: center; padding: 20px; font-size: 0.78rem; color: var(--ink-muted); border-top: var(--border); }
+    footer a { color: var(--gold-dark); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">Mon<span>Mariage</span>Parfait</a>
+  <a href="../index.html" class="nav-back">← Retour à l'accueil</a>
+</nav>
+
+<main>
+  <div class="login-container">
+    <div class="login-header">
+      <div class="login-emblem">💍</div>
+      <h1>Bon retour <em>parmi nous</em></h1>
+      <p>Pas encore de compte ? <a href="inscription.html">Créer votre espace gratuitement</a></p>
+    </div>
+
+    <div class="login-card">
+
+      <!-- LOGIN PANEL -->
+      <div class="login-panel" id="login-panel">
+        <div class="alert error" id="alert-error">E-mail ou mot de passe incorrect. Veuillez réessayer.</div>
+
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label for="email">Adresse e-mail</label>
+            <input type="email" id="email" name="email" placeholder="marie@exemple.fr" autocomplete="email" required>
+            <div class="form-error" id="err-email">Adresse e-mail invalide.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Mot de passe</label>
+            <div class="password-wrapper">
+              <input type="password" id="password" name="password" placeholder="Votre mot de passe" autocomplete="current-password" required>
+              <button type="button" class="toggle-pw" onclick="togglePassword('password', this)" aria-label="Voir">👁</button>
+            </div>
+            <div class="form-error" id="err-password">Mot de passe requis.</div>
+          </div>
+
+          <div class="form-meta">
+            <label class="remember-me">
+              <input type="checkbox" id="remember" checked>
+              Se souvenir de moi
+            </label>
+            <button type="button" class="forgot-link" onclick="showForgot()">Mot de passe oublié ?</button>
+          </div>
+
+          <button type="submit" class="btn-login" id="btn-login">Se connecter →</button>
+
+          <div class="security-note">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Connexion sécurisée — chiffrement SSL 256-bit
+          </div>
+        </form>
+      </div>
+
+      <!-- FORGOT PASSWORD PANEL -->
+      <div class="forgot-panel" id="forgot-panel">
+        <button class="back-btn" onclick="showLogin()">← Retour à la connexion</button>
+        <div class="alert success" id="alert-reset">Un lien de réinitialisation vous a été envoyé par e-mail.</div>
+
+        <p style="font-size:0.9rem;color:var(--ink-muted);margin-bottom:20px;">Saisissez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.</p>
+
+        <form id="forgot-form" novalidate>
+          <div class="form-group">
+            <label for="forgot-email">Adresse e-mail</label>
+            <input type="email" id="forgot-email" name="email" placeholder="marie@exemple.fr" required>
+            <div class="form-error" id="err-forgot-email">Adresse e-mail invalide.</div>
+          </div>
+          <button type="submit" class="btn-login">Envoyer le lien →</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="register-cta">
+      <p>Vous n'avez pas encore de compte ?</p>
+      <a href="inscription.html" class="btn-register">Créer mon espace mariage</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <a href="../mentions-legales.html">Mentions légales</a> · 
+  <a href="../confidentialite.html">Confidentialité</a> · 
+  <a href="../cgv.html">CGV</a>
+</footer>
+
+<script>
+  function togglePassword(id, btn) {
+    const inp = document.getElementById(id);
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+    else { inp.type = 'password'; btn.textContent = '👁'; }
+  }
+
+  function showForgot() {
+    document.getElementById('login-panel').classList.add('hidden');
+    document.getElementById('forgot-panel').classList.add('visible');
+  }
+
+  function showLogin() {
+    document.getElementById('login-panel').classList.remove('hidden');
+    document.getElementById('forgot-panel').classList.remove('visible');
+    document.getElementById('alert-reset').classList.remove('show');
+  }
+
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const pw = document.getElementById('password').value;
+    let valid = true;
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('err-email').classList.add('show'); valid = false;
+    } else { document.getElementById('err-email').classList.remove('show'); }
+    if (!pw) {
+      document.getElementById('err-password').classList.add('show'); valid = false;
+    } else { document.getElementById('err-password').classList.remove('show'); }
+    if (!valid) return;
+
+    const btn = document.getElementById('btn-login');
+    btn.textContent = 'Connexion en cours…'; btn.disabled = true;
+    await new Promise(r => setTimeout(r, 1500));
+    // In production, call your auth API here
+    window.location.href = 'app.html';
+  });
+
+  document.getElementById('forgot-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('forgot-email').value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('err-forgot-email').classList.add('show'); return;
+    }
+    document.getElementById('err-forgot-email').classList.remove('show');
+    await new Promise(r => setTimeout(r, 1000));
+    document.getElementById('alert-reset').classList.add('show');
+  });
+</script>
+</body>
+</html>

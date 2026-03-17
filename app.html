@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Tableau de Bord | MonMariagePerfait.fr</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #C8A96E; --gold-light: #E2C98A; --gold-dark: #9B7E4A;
+      --cream: #FAF7F2; --cream-dark: #F0EAE0;
+      --ink: #1A1612; --ink-soft: #3D3530; --ink-muted: #6B5E56;
+      --red-soft: #C25B5B; --green-soft: #4A8C6E; --blue-soft: #4A6E8C;
+      --white: #fff;
+      --shadow: 0 2px 16px rgba(26,22,18,0.08);
+      --shadow-lg: 0 8px 40px rgba(26,22,18,0.12);
+      --radius: 4px; --radius-lg: 12px;
+      --border: 1px solid rgba(200,169,110,0.18);
+      --sidebar-w: 260px;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Jost', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; }
+    body { font-family: var(--font-sans); background: var(--cream); color: var(--ink); line-height: 1.6; overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    button { cursor: pointer; border: none; background: none; font: inherit; }
+
+    /* ===== LAYOUT ===== */
+    .app { display: flex; min-height: 100vh; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: var(--sidebar-w); background: var(--ink); color: var(--cream);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; height: 100vh;
+      z-index: 100; overflow-y: auto;
+      transition: transform 0.3s ease;
+    }
+    .sidebar__brand {
+      padding: 28px 24px 24px;
+      border-bottom: 1px solid rgba(200,169,110,0.15);
+    }
+    .sidebar__logo { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .logo-ring { color: var(--gold); font-size: 1.1rem; }
+    .logo-text { font-family: var(--font-sans); font-size: 0.95rem; letter-spacing: 0.02em; }
+    .logo-text strong { color: var(--gold-light); }
+    .sidebar__couple {
+      font-size: 0.78rem; opacity: 0.6; margin-top: 8px;
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .sidebar__nav { padding: 16px 0; flex: 1; }
+    .sidebar__section { padding: 16px 20px 8px; font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.4; }
+    .sidebar__link {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 20px; font-size: 0.88rem;
+      color: rgba(250,247,242,0.75); transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar__link:hover { color: var(--cream); background: rgba(200,169,110,0.08); }
+    .sidebar__link.active { color: var(--gold-light); border-left-color: var(--gold); background: rgba(200,169,110,0.12); }
+    .sidebar__link .icon { font-size: 1.05rem; width: 20px; text-align: center; }
+    .sidebar__link .badge {
+      margin-left: auto; background: var(--gold); color: var(--ink);
+      font-size: 0.68rem; font-weight: 600; padding: 2px 7px; border-radius: 10px;
+    }
+    .sidebar__footer {
+      padding: 20px 24px;
+      border-top: 1px solid rgba(200,169,110,0.15);
+    }
+    .sidebar__footer a { font-size: 0.82rem; opacity: 0.6; display: block; margin-bottom: 8px; transition: opacity 0.2s; }
+    .sidebar__footer a:hover { opacity: 1; }
+
+    /* ===== MAIN CONTENT ===== */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ===== TOPBAR ===== */
+    .topbar {
+      background: var(--white); border-bottom: var(--border);
+      padding: 0 32px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar__left { display: flex; align-items: center; gap: 16px; }
+    .topbar__title { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 400; }
+    .topbar__subtitle { font-size: 0.8rem; color: var(--ink-muted); }
+    .topbar__right { display: flex; align-items: center; gap: 16px; }
+    .topbar__days {
+      background: rgba(200,169,110,0.12); border: 1px solid rgba(200,169,110,0.3);
+      padding: 6px 16px; border-radius: 20px; text-align: center;
+    }
+    .topbar__days .days-count { font-family: var(--font-serif); font-size: 1.4rem; color: var(--gold-dark); font-weight: 400; }
+    .topbar__days .days-label { font-size: 0.68rem; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    .topbar__avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--gold); color: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 0.85rem;
+    }
+
+    /* ===== PAGE CONTENT ===== */
+    .page { padding: 36px 32px; }
+    .page-hidden { display: none; }
+
+    /* ===== STAT CARDS ===== */
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; margin-bottom: 32px; }
+    .stat-card {
+      background: var(--white); border: var(--border); border-radius: var(--radius-lg);
+      padding: 20px 24px; box-shadow: var(--shadow);
+    }
+    .stat-card__icon { font-size: 1.3rem; margin-bottom: 8px; }
+    .stat-card__val { font-family: var(--font-serif); font-size: 2rem; font-weight: 300; color: var(--ink); }
+    .stat-card__label { font-size: 0.78rem; color: var(--ink-muted); letter-spacing: 0.04em; margin-top: 2px; }
+    .stat-card__trend { font-size: 0.75rem; margin-top: 8px; }
+    .stat-card__trend.up { color: var(--green-soft); }
+    .stat-card__trend.warn { color: #C28A4A; }
+
+    /* ===== PANELS ===== */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+    .panel {
+      background: var(--white); border: var(--border); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .panel--full { grid-column: 1 / -1; }
+    .panel__header {
+      padding: 20px 24px 16px;
+      border-bottom: var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel__title { font-family: var(--font-serif); font-size: 1.15rem; font-weight: 400; }
+    .panel__action { font-size: 0.8rem; color: var(--gold-dark); cursor: pointer; }
+    .panel__body { padding: 20px 24px; }
+
+    /* ===== TASKS ===== */
+    .task-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(200,169,110,0.1);
+    }
+    .task-item:last-child { border-bottom: none; }
+    .task-check {
+      width: 18px; height: 18px; border: 1.5px solid rgba(200,169,110,0.5);
+      border-radius: 3px; flex-shrink: 0; margin-top: 2px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .task-check.done { background: var(--green-soft); border-color: var(--green-soft); color: white; font-size: 0.7rem; }
+    .task-item__content { flex: 1; }
+    .task-item__text { font-size: 0.9rem; color: var(--ink-soft); }
+    .task-item__text.done { text-decoration: line-through; opacity: 0.5; }
+    .task-item__meta { font-size: 0.75rem; color: var(--ink-muted); margin-top: 2px; }
+    .task-item__tag {
+      font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 10px; margin-left: auto; flex-shrink: 0;
+    }
+    .tag--urgent { background: rgba(194,91,91,0.1); color: var(--red-soft); }
+    .tag--ok { background: rgba(74,140,110,0.1); color: var(--green-soft); }
+    .tag--pending { background: rgba(200,169,110,0.15); color: var(--gold-dark); }
+
+    /* ===== BUDGET BAR ===== */
+    .budget-row { margin-bottom: 14px; }
+    .budget-row__header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .budget-row__name { font-size: 0.88rem; color: var(--ink-soft); }
+    .budget-row__vals { font-size: 0.8rem; color: var(--ink-muted); }
+    .budget-bar { height: 6px; background: var(--cream-dark); border-radius: 3px; overflow: hidden; }
+    .budget-bar__fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+    .budget-bar__fill.ok { background: var(--green-soft); }
+    .budget-bar__fill.warn { background: #C28A4A; }
+    .budget-bar__fill.over { background: var(--red-soft); }
+
+    /* ===== INVITES TABLE ===== */
+    .invite-table { width: 100%; font-size: 0.85rem; border-collapse: collapse; }
+    .invite-table th { padding: 8px 12px; text-align: left; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); border-bottom: var(--border); }
+    .invite-table td { padding: 11px 12px; border-bottom: 1px solid rgba(200,169,110,0.08); }
+    .invite-table tr:hover td { background: rgba(200,169,110,0.04); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .status-dot.confirm { background: var(--green-soft); }
+    .status-dot.pending { background: #C28A4A; }
+    .status-dot.decline { background: var(--red-soft); }
+
+    /* ===== PRESTATAIRES ===== */
+    .presta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .presta-card {
+      border: var(--border); border-radius: var(--radius-lg); padding: 16px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .presta-card__top { display: flex; align-items: center; gap: 10px; }
+    .presta-card__icon { font-size: 1.4rem; }
+    .presta-card__name { font-size: 0.88rem; font-weight: 500; color: var(--ink); }
+    .presta-card__cat { font-size: 0.72rem; color: var(--ink-muted); }
+    .presta-card__status { font-size: 0.75rem; margin-top: 2px; }
+    .presta-card__status.signed { color: var(--green-soft); }
+    .presta-card__status.quote { color: #C28A4A; }
+    .presta-card__status.search { color: var(--ink-muted); }
+    .presta-card__price { font-size: 0.8rem; color: var(--gold-dark); font-weight: 500; }
+
+    /* ===== COUNTDOWN ===== */
+    .countdown-hero {
+      background: var(--ink); color: var(--cream);
+      border-radius: var(--radius-lg); padding: 32px;
+      text-align: center; margin-bottom: 32px;
+    }
+    .countdown-hero h2 { font-family: var(--font-serif); font-size: 1.4rem; font-weight: 300; margin-bottom: 20px; opacity: 0.8; }
+    .countdown-digits { display: flex; gap: 24px; justify-content: center; align-items: flex-end; }
+    .countdown-unit { text-align: center; }
+    .countdown-unit .num { font-family: var(--font-serif); font-size: 3.5rem; font-weight: 300; color: var(--gold-light); line-height: 1; }
+    .countdown-unit .lbl { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.5; margin-top: 4px; }
+    .countdown-sep { font-size: 2rem; opacity: 0.3; padding-bottom: 8px; }
+
+    /* ===== MOBILE SIDEBAR TOGGLE ===== */
+    .menu-toggle {
+      display: none; width: 40px; height: 40px; align-items: center;
+      justify-content: center; background: none; border: var(--border);
+      border-radius: var(--radius); cursor: pointer; font-size: 1.2rem;
+    }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 99; }
+
+    /* ===== NAV TABS (mobile) ===== */
+    .tabs { display: flex; gap: 4px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px; }
+    .tab-btn {
+      padding: 8px 18px; border-radius: 20px; font-size: 0.82rem;
+      border: 1px solid rgba(200,169,110,0.25); white-space: nowrap;
+      color: var(--ink-muted); transition: all 0.2s;
+    }
+    .tab-btn.active { background: var(--gold); border-color: var(--gold); color: var(--ink); font-weight: 500; }
+
+    /* ===== QUICK ACTIONS ===== */
+    .quick-actions { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+    .quick-btn {
+      display: flex; align-items: center; gap: 8px; padding: 10px 20px;
+      background: var(--white); border: var(--border); border-radius: var(--radius-lg);
+      font-size: 0.85rem; color: var(--ink-soft); box-shadow: var(--shadow);
+      transition: all 0.2s; cursor: pointer;
+    }
+    .quick-btn:hover { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+    .quick-btn .icon { font-size: 1rem; }
+
+    /* ===== ADD TASK FORM ===== */
+    .add-task-form { display: flex; gap: 10px; margin-top: 16px; }
+    .add-task-input {
+      flex: 1; padding: 10px 14px; border: var(--border); border-radius: var(--radius-lg);
+      font: inherit; font-size: 0.88rem; background: var(--cream);
+      color: var(--ink); outline: none; transition: border-color 0.2s;
+    }
+    .add-task-input:focus { border-color: var(--gold); }
+    .add-task-btn {
+      padding: 10px 18px; background: var(--gold); color: var(--ink);
+      border-radius: var(--radius-lg); font-size: 0.85rem; font-weight: 500;
+      transition: background 0.2s;
+    }
+    .add-task-btn:hover { background: var(--gold-light); }
+
+    /* ===== PROGRESS RING ===== */
+    .progress-ring-wrapper { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
+    .progress-ring { position: relative; }
+    .progress-ring svg { transform: rotate(-90deg); }
+    .progress-ring__text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 1.3rem; color: var(--gold-dark); }
+    .progress-ring__info h4 { font-family: var(--font-serif); font-size: 1.1rem; margin-bottom: 4px; }
+    .progress-ring__info p { font-size: 0.82rem; color: var(--ink-muted); }
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .presta-grid { grid-template-columns: 1fr; }
+    }
+    @media(max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .main { margin-left: 0; }
+      .topbar { padding: 0 16px; }
+      .page { padding: 20px 16px; }
+      .menu-toggle { display: flex; }
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .panels { grid-template-columns: 1fr; }
+      .countdown-digits { gap: 12px; }
+      .countdown-unit .num { font-size: 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__logo">
+        <span class="logo-ring">◈</span>
+        <span class="logo-text">Mon<strong>Mariage</strong>Parfait</span>
+      </div>
+      <div class="sidebar__couple">Sophie & Thomas · 14 juin 2025</div>
+    </div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Principal</div>
+      <a href="#" class="sidebar__link active" data-page="dashboard" onclick="navigate(event,'dashboard')">
+        <span class="icon">🏠</span> Tableau de bord
+      </a>
+      <a href="#" class="sidebar__link" data-page="tasks" onclick="navigate(event,'tasks')">
+        <span class="icon">✓</span> Liste de tâches
+        <span class="badge">12</span>
+      </a>
+      <a href="#" class="sidebar__link" data-page="budget" onclick="navigate(event,'budget')">
+        <span class="icon">💶</span> Budget
+      </a>
+      <a href="#" class="sidebar__link" data-page="invites" onclick="navigate(event,'invites')">
+        <span class="icon">👥</span> Invités
+        <span class="badge">34</span>
+      </a>
+      <div class="sidebar__section">Prestataires</div>
+      <a href="#" class="sidebar__link" data-page="prestataires" onclick="navigate(event,'prestataires')">
+        <span class="icon">🤝</span> Mes prestataires
+      </a>
+      <a href="#" class="sidebar__link" data-page="planning" onclick="navigate(event,'planning')">
+        <span class="icon">📅</span> Planning jour J
+      </a>
+      <div class="sidebar__section">Détails</div>
+      <a href="#" class="sidebar__link" data-page="tables" onclick="navigate(event,'tables')">
+        <span class="icon">🪑</span> Plan de table
+      </a>
+      <a href="#" class="sidebar__link" data-page="ceremony" onclick="navigate(event,'ceremony')">
+        <span class="icon">💍</span> Cérémonie
+      </a>
+      <a href="#" class="sidebar__link" data-page="honeymoon" onclick="navigate(event,'honeymoon')">
+        <span class="icon">✈️</span> Voyage de noces
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <a href="#">⚙️ Paramètres du compte</a>
+      <a href="#">📤 Partager avec partenaire</a>
+      <a href="connexion.html">← Déconnexion</a>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar__left">
+        <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+        <div>
+          <div class="topbar__title" id="pageTitle">Tableau de bord</div>
+          <div class="topbar__subtitle">Bonjour Sophie 👋  Votre mariage se précise !</div>
+        </div>
+      </div>
+      <div class="topbar__right">
+        <div class="topbar__days">
+          <div class="days-count" id="daysCount">—</div>
+          <div class="days-label">jours restants</div>
+        </div>
+        <div class="topbar__avatar">ST</div>
+      </div>
+    </header>
+
+    <!-- ===== PAGE : DASHBOARD ===== -->
+    <div class="page" id="page-dashboard">
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card__icon">💶</div>
+          <div class="stat-card__val">18 240€</div>
+          <div class="stat-card__label">Budget dépensé</div>
+          <div class="stat-card__trend warn">▲ 73% du total (25 000€)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon">👥</div>
+          <div class="stat-card__val">87</div>
+          <div class="stat-card__label">Invités confirmés</div>
+          <div class="stat-card__trend up">✓ sur 110 invités</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon">✓</div>
+          <div class="stat-card__val">64%</div>
+          <div class="stat-card__label">Tâches accomplies</div>
+          <div class="stat-card__trend up">48 / 75 tâches</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon">🤝</div>
+          <div class="stat-card__val">9</div>
+          <div class="stat-card__label">Prestataires signés</div>
+          <div class="stat-card__trend warn">2 devis en attente</div>
+        </div>
+      </div>
+
+      <!-- Countdown -->
+      <div class="countdown-hero">
+        <h2>✨ Sophie & Thomas — 14 juin 2025</h2>
+        <div class="countdown-digits">
+          <div class="countdown-unit"><div class="num" id="cd-days">89</div><div class="lbl">Jours</div></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><div class="num" id="cd-hours">14</div><div class="lbl">Heures</div></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><div class="num" id="cd-mins">32</div><div class="lbl">Minutes</div></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><div class="num" id="cd-secs">07</div><div class="lbl">Secondes</div></div>
+        </div>
+      </div>
+
+      <div class="panels">
+        <!-- Prochaines tâches -->
+        <div class="panel">
+          <div class="panel__header">
+            <div class="panel__title">Prochaines tâches urgentes</div>
+            <span class="panel__action" onclick="navigate(null,'tasks')">Voir tout →</span>
+          </div>
+          <div class="panel__body">
+            <div class="task-item">
+              <div class="task-check" onclick="toggleTask(this)"></div>
+              <div class="task-item__content">
+                <div class="task-item__text">Confirmer le menu final avec le traiteur</div>
+                <div class="task-item__meta">Avant le 15 mars</div>
+              </div>
+              <span class="task-item__tag tag--urgent">Urgent</span>
+            </div>
+            <div class="task-item">
+              <div class="task-check" onclick="toggleTask(this)"></div>
+              <div class="task-item__content">
+                <div class="task-item__text">Envoyer les faire-part restants (23)</div>
+                <div class="task-item__meta">Avant le 20 mars</div>
+              </div>
+              <span class="task-item__tag tag--urgent">Urgent</span>
+            </div>
+            <div class="task-item">
+              <div class="task-check done">✓</div>
+              <div class="task-item__content">
+                <div class="task-item__text done">Réserver le photographe</div>
+                <div class="task-item__meta">Fait le 10 janvier</div>
+              </div>
+              <span class="task-item__tag tag--ok">Fait</span>
+            </div>
+            <div class="task-item">
+              <div class="task-check" onclick="toggleTask(this)"></div>
+              <div class="task-item__content">
+                <div class="task-item__text">Essayage final de la robe</div>
+                <div class="task-item__meta">Rendez-vous le 28 mars</div>
+              </div>
+              <span class="task-item__tag tag--pending">À venir</span>
+            </div>
+            <div class="task-item">
+              <div class="task-check" onclick="toggleTask(this)"></div>
+              <div class="task-item__content">
+                <div class="task-item__text">Finaliser le plan de table</div>
+                <div class="task-item__meta">Avant le 1er mai</div>
+              </div>
+              <span class="task-item__tag tag--pending">À venir</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Budget aperçu -->
+        <div class="panel">
+          <div class="panel__header">
+            <div class="panel__title">Budget — aperçu</div>
+            <span class="panel__action" onclick="navigate(null,'budget')">Détail →</span>
+          </div>
+          <div class="panel__body">
+            <div class="budget-row">
+              <div class="budget-row__header">
+                <span class="budget-row__name">🏛️ Salle & domaine</span>
+                <span class="budget-row__vals">3 800€ / 4 000€</span>
+              </div>
+              <div class="budget-bar"><div class="budget-bar__fill ok" style="width:95%"></div></div>
+            </div>
+            <div class="budget-row">
+              <div class="budget-row__header">
+                <span class="budget-row__name">🍽️ Traiteur</span>
+                <span class="budget-row__vals">7 200€ / 8 000€</span>
+              </div>
+              <div class="budget-bar"><div class="budget-bar__fill ok" style="width:90%"></div></div>
+            </div>
+            <div class="budget-row">
+              <div class="budget-row__header">
+                <span class="budget-row__name">📷 Photo & Vidéo</span>
+                <span class="budget-row__vals">3 200€ / 3 000€</span>
+              </div>
+              <div class="budget-bar"><div class="budget-bar__fill over" style="width:100%"></div></div>
+            </div>
+            <div class="budget-row">
+              <div class="budget-row__header">
+                <span class="budget-row__name">💐 Fleurs & Déco</span>
+                <span class="budget-row__vals">1 840€ / 2 500€</span>
+              </div>
+              <div class="budget-bar"><div class="budget-bar__fill ok" style="width:73%"></div></div>
+            </div>
+            <div class="budget-row">
+              <div class="budget-row__header">
+                <span class="budget-row__name">🎵 Musique</span>
+                <span class="budget-row__vals">800€ / 1 500€</span>
+              </div>
+              <div class="budget-bar"><div class="budget-bar__fill warn" style="width:53%"></div></div>
+            </div>
+            <div class="budget-row">
+              <div class="budget-row__header">
+                <span class="budget-row__name">👗 Tenues</span>
+                <span class="budget-row__vals">2 400€ / 2 500€</span>
+              </div>
+              <div class="budget-bar"><div class="budget-bar__fill warn" style="width:96%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Invités aperçu -->
+        <div class="panel">
+          <div class="panel__header">
+            <div class="panel__title">Dernières réponses invités</div>
+            <span class="panel__action" onclick="navigate(null,'invites')">Liste complète →</span>
+          </div>
+          <div class="panel__body">
+            <table class="invite-table">
+              <thead><tr><th>Invité</th><th>Table</th><th>Statut</th><th>Régime</th></tr></thead>
+              <tbody>
+                <tr><td>Marie & Pierre L.</td><td>Table 3</td><td><span class="status-dot confirm"></span>Confirmé</td><td>—</td></tr>
+                <tr><td>Grand-mère Colette</td><td>Table 1</td><td><span class="status-dot confirm"></span>Confirmé</td><td>Sans gluten</td></tr>
+                <tr><td>Antoine B.</td><td>—</td><td><span class="status-dot pending"></span>En attente</td><td>—</td></tr>
+                <tr><td>Lucie & Marc D.</td><td>—</td><td><span class="status-dot pending"></span>En attente</td><td>—</td></tr>
+                <tr><td>Oncle Bernard</td><td>—</td><td><span class="status-dot decline"></span>Décliné</td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Prestataires aperçu -->
+        <div class="panel">
+          <div class="panel__header">
+            <div class="panel__title">Mes prestataires</div>
+            <span class="panel__action" onclick="navigate(null,'prestataires')">Tous →</span>
+          </div>
+          <div class="panel__body">
+            <div class="presta-grid">
+              <div class="presta-card">
+                <div class="presta-card__top"><span class="presta-card__icon">📷</span><div><div class="presta-card__name">Atelier Lumière</div><div class="presta-card__cat">Photographe</div></div></div>
+                <div class="presta-card__status signed">● Contrat signé</div>
+                <div class="presta-card__price">2 400€</div>
+              </div>
+              <div class="presta-card">
+                <div class="presta-card__top"><span class="presta-card__icon">🍽️</span><div><div class="presta-card__name">Saveurs & Prestige</div><div class="presta-card__cat">Traiteur</div></div></div>
+                <div class="presta-card__status signed">● Contrat signé</div>
+                <div class="presta-card__price">7 200€</div>
+              </div>
+              <div class="presta-card">
+                <div class="presta-card__top"><span class="presta-card__icon">💐</span><div><div class="presta-card__name">Fleurs de Jade</div><div class="presta-card__cat">Fleuriste</div></div></div>
+                <div class="presta-card__status quote">◎ Devis reçu</div>
+                <div class="presta-card__price">1 840€</div>
+              </div>
+              <div class="presta-card">
+                <div class="presta-card__top"><span class="presta-card__icon">🎵</span><div><div class="presta-card__name">DJ Mix 'n Love</div><div class="presta-card__cat">DJ</div></div></div>
+                <div class="presta-card__status quote">◎ Devis en cours</div>
+                <div class="presta-card__price">~800€</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAGE : TÂCHES ===== -->
+    <div class="page page-hidden" id="page-tasks">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="filterTasks(this,'all')">Toutes (75)</button>
+        <button class="tab-btn" onclick="filterTasks(this,'urgent')">Urgentes (12)</button>
+        <button class="tab-btn" onclick="filterTasks(this,'done')">Faites (48)</button>
+        <button class="tab-btn" onclick="filterTasks(this,'pending')">À faire (27)</button>
+      </div>
+      <div class="panel">
+        <div class="panel__header"><div class="panel__title">Liste de tâches complète</div></div>
+        <div class="panel__body" id="taskList">
+          <!-- tasks populated by JS -->
+        </div>
+        <div style="padding:0 24px 20px">
+          <div class="add-task-form">
+            <input type="text" class="add-task-input" id="newTaskInput" placeholder="Ajouter une tâche..." onkeydown="if(event.key==='Enter')addTask()">
+            <button class="add-task-btn" onclick="addTask()">+ Ajouter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAGE : BUDGET ===== -->
+    <div class="page page-hidden" id="page-budget">
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card">
+          <div class="stat-card__icon">💰</div>
+          <div class="stat-card__val">25 000€</div>
+          <div class="stat-card__label">Budget total</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon">💸</div>
+          <div class="stat-card__val">18 240€</div>
+          <div class="stat-card__label">Engagé / dépensé</div>
+          <div class="stat-card__trend warn">73% du budget</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon">🏦</div>
+          <div class="stat-card__val">6 760€</div>
+          <div class="stat-card__label">Restant disponible</div>
+          <div class="stat-card__trend up">dont 2 500€ réservés</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel__header"><div class="panel__title">Répartition du budget par poste</div></div>
+        <div class="panel__body" id="budgetDetail">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAGE : INVITÉS ===== -->
+    <div class="page page-hidden" id="page-invites">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-card__icon">✅</div><div class="stat-card__val">87</div><div class="stat-card__label">Confirmés</div></div>
+        <div class="stat-card"><div class="stat-card__icon">⏳</div><div class="stat-card__val">18</div><div class="stat-card__label">En attente</div></div>
+        <div class="stat-card"><div class="stat-card__icon">❌</div><div class="stat-card__val">5</div><div class="stat-card__label">Déclinés</div></div>
+        <div class="stat-card"><div class="stat-card__icon">👶</div><div class="stat-card__val">8</div><div class="stat-card__label">Enfants</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel__header">
+          <div class="panel__title">Liste des invités (110)</div>
+          <span class="panel__action">+ Ajouter un invité</span>
+        </div>
+        <div class="panel__body">
+          <table class="invite-table" style="width:100%">
+            <thead><tr><th>Nom</th><th>Côté</th><th>Table</th><th>Statut</th><th>Régime</th><th>Hébergement</th></tr></thead>
+            <tbody id="inviteTable"><!-- populated by JS --></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAGE : PRESTATAIRES ===== -->
+    <div class="page page-hidden" id="page-prestataires">
+      <div class="quick-actions">
+        <button class="quick-btn"><span class="icon">+</span> Ajouter un prestataire</button>
+        <button class="quick-btn"><span class="icon">📤</span> Exporter contacts</button>
+        <button class="quick-btn"><span class="icon">📋</span> Modèle email prestataire</button>
+      </div>
+      <div class="panel">
+        <div class="panel__header"><div class="panel__title">Tous mes prestataires</div></div>
+        <div class="panel__body">
+          <div id="prestatairesList" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <!-- populated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAGE : PLANNING JOUR J ===== -->
+    <div class="page page-hidden" id="page-planning">
+      <div class="panel">
+        <div class="panel__header"><div class="panel__title">🗓️ Planning du Jour J — 14 juin 2025</div></div>
+        <div class="panel__body">
+          <div id="planningList"><!-- populated by JS --></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAGES PLACEHOLDER ===== -->
+    <div class="page page-hidden" id="page-tables">
+      <div class="panel"><div class="panel__header"><div class="panel__title">🪑 Plan de table</div></div><div class="panel__body"><p style="color:var(--ink-muted);font-size:0.9rem">Glissez-déposez vos invités sur les tables. Fonctionnalité complète disponible dans votre espace.</p></div></div>
+    </div>
+    <div class="page page-hidden" id="page-ceremony">
+      <div class="panel"><div class="panel__header"><div class="panel__title">💍 Détails de la cérémonie</div></div><div class="panel__body"><p style="color:var(--ink-muted);font-size:0.9rem">Gérez votre cérémonie civile, laïque ou religieuse, les rituels et le programme.</p></div></div>
+    </div>
+    <div class="page page-hidden" id="page-honeymoon">
+      <div class="panel"><div class="panel__header"><div class="panel__title">✈️ Voyage de noces</div></div><div class="panel__body"><p style="color:var(--ink-muted);font-size:0.9rem">Organisez votre voyage de noces : destination, vols, hôtels, activités.</p></div></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ===== DATA =====
+const tasks = [
+  { id:1, text:"Confirmer le menu final avec le traiteur", cat:"Traiteur", due:"15 mars", done:false, urgent:true },
+  { id:2, text:"Envoyer les faire-part restants (23)", cat:"Invités", due:"20 mars", done:false, urgent:true },
+  { id:3, text:"Essayage final de la robe", cat:"Tenues", due:"28 mars", done:false, urgent:false },
+  { id:4, text:"Finaliser le plan de table", cat:"Logistique", due:"1 mai", done:false, urgent:false },
+  { id:5, text:"Confirmer le DJ pour le conducteur musical", cat:"Musique", due:"15 avril", done:false, urgent:false },
+  { id:6, text:"Préparer les enveloppes prestataires", cat:"Budget", due:"1 juin", done:false, urgent:false },
+  { id:7, text:"Réserver le photographe", cat:"Photo", due:"10 janv.", done:true, urgent:false },
+  { id:8, text:"Signer le contrat de la salle", cat:"Salle", due:"5 déc.", done:true, urgent:false },
+  { id:9, text:"Choisir le menu de dégustation traiteur", cat:"Traiteur", due:"8 jan.", done:true, urgent:false },
+  { id:10, text:"Commander les alliances", cat:"Tenues", due:"15 fév.", done:true, urgent:false },
+  { id:11, text:"Envoyer les save-the-dates", cat:"Invités", due:"1 fév.", done:true, urgent:false },
+  { id:12, text:"Réserver le DJ", cat:"Musique", due:"10 fév.", done:true, urgent:false },
+];
+
+const budgetPosts = [
+  { name:"🏛️ Salle & domaine", budget:4000, spent:3800 },
+  { name:"🍽️ Traiteur", budget:8000, spent:7200 },
+  { name:"📷 Photographe", budget:3000, spent:3200 },
+  { name:"🎬 Vidéaste", budget:1500, spent:1200 },
+  { name:"💐 Fleurs & Décoration", budget:2500, spent:1840 },
+  { name:"🎵 Musique / DJ", budget:1500, spent:800 },
+  { name:"👗 Tenues", budget:2500, spent:2400 },
+  { name:"🎂 Gâteau", budget:600, spent:0 },
+  { name:"💌 Papeterie", budget:400, spent:320 },
+  { name:"✂️ Coiffure & Maquillage", budget:350, spent:0 },
+  { name:"💍 Alliances", budget:1200, spent:1200 },
+  { name:"🚗 Transport", budget:500, spent:280 },
+  { name:"🎁 Cadeaux invités", budget:450, spent:0 },
+  { name:"⚡ Imprévus", budget:2500, spent:0 },
+];
+
+const prestataires = [
+  { icon:"📷", name:"Atelier Lumière — Studio photo", cat:"Photographe", status:"signed", statusLabel:"Contrat signé", price:"2 400€", tel:"06 12 34 56 78", email:"contact@atelierlumieres.fr" },
+  { icon:"🎬", name:"FilmWedding.fr", cat:"Vidéaste", status:"signed", statusLabel:"Contrat signé", price:"1 200€", tel:"06 23 45 67 89", email:"pro@filmwedding.fr" },
+  { icon:"🍽️", name:"Saveurs & Prestige", cat:"Traiteur", status:"signed", statusLabel:"Contrat signé", price:"7 200€", tel:"01 23 45 67 89", email:"mariages@saveursprestige.fr" },
+  { icon:"🏛️", name:"Domaine des Rosiers", cat:"Salle de réception", status:"signed", statusLabel:"Contrat signé", price:"3 800€", tel:"03 21 43 65 87", email:"contact@domainedesrosiers.fr" },
+  { icon:"💐", name:"Fleurs de Jade", cat:"Fleuriste / Décoratrice", status:"quote", statusLabel:"Devis reçu", price:"1 840€", tel:"06 87 65 43 21", email:"jade@fleursdejade.fr" },
+  { icon:"🎵", name:"DJ Mix 'n Love", cat:"DJ / Animation", status:"quote", statusLabel:"Devis en cours", price:"~800€", tel:"06 11 22 33 44", email:"booking@mixnlove.fr" },
+  { icon:"🚗", name:"Prestige Cars Event", cat:"Transport", status:"signed", statusLabel:"Réservé", price:"280€", tel:"06 55 66 77 88", email:"events@prestigecars.fr" },
+  { icon:"💈", name:"Salon Belle & Co", cat:"Coiffure & Maquillage", status:"search", statusLabel:"À confirmer", price:"—", tel:"—", email:"—" },
+];
+
+const planningJourJ = [
+  { time:"8h00", event:"Arrivée équipe coiffure & maquillage", who:"Sophie + témoins" },
+  { time:"10h30", event:"Séance photos getting ready", who:"Thomas + garçons" },
+  { time:"12h00", event:"Départ vers la mairie", who:"Tous" },
+  { time:"12h30", event:"Cérémonie civile en mairie", who:"Tous" },
+  { time:"13h15", event:"Photos extérieures mairie", who:"Sophie, Thomas + famille" },
+  { time:"14h30", event:"Arrivée au domaine, installation invités", who:"Prestataires + familles" },
+  { time:"15h00", event:"Cérémonie laïque dans les jardins", who:"Tous" },
+  { time:"16h00", event:"Vin d'honneur + cocktail", who:"Tous" },
+  { time:"19h30", event:"Ouverture du dîner assis", who:"Tous" },
+  { time:"21h00", event:"Discours témoins & parents", who:"Témoins désignés" },
+  { time:"22h00", event:"Ouverture de la piste de danse", who:"Sophie & Thomas" },
+  { time:"23h30", event:"Pièce montée & dessert buffet", who:"Tous" },
+  { time:"04h00", event:"Fin officielle de la soirée", who:"—" },
+];
+
+const invitesData = [
+  { name:"Sophie Martin (mariée)", side:"Mariée", table:"Table 1", status:"confirm", diet:"—", hotel:"Sur place" },
+  { name:"Thomas Dupont (marié)", side:"Marié", table:"Table 1", status:"confirm", diet:"—", hotel:"Sur place" },
+  { name:"Marie & Pierre Laurent", side:"Mariée", table:"Table 3", status:"confirm", diet:"—", hotel:"Non" },
+  { name:"Grand-mère Colette", side:"Mariée", table:"Table 1", status:"confirm", diet:"Sans gluten", hotel:"Sur place" },
+  { name:"Antoine Bonnet", side:"Marié", table:"—", status:"pending", diet:"—", hotel:"—" },
+  { name:"Lucie & Marc Durand", side:"Marié", table:"—", status:"pending", diet:"—", hotel:"—" },
+  { name:"Oncle Bernard", side:"Mariée", table:"—", status:"decline", diet:"—", hotel:"—" },
+  { name:"Isabelle & Julien K.", side:"Amis", table:"Table 5", status:"confirm", diet:"Végétarien", hotel:"Oui" },
+  { name:"Emma Petit", side:"Amis", table:"Table 7", status:"confirm", diet:"—", hotel:"Non" },
+  { name:"Lucas & Noémie V.", side:"Amis", table:"Table 6", status:"pending", diet:"—", hotel:"—" },
+];
+
+// ===== NAVIGATION =====
+function navigate(e, page) {
+  if(e) e.preventDefault();
+  document.querySelectorAll('.page').forEach(p => p.classList.add('page-hidden'));
+  document.getElementById('page-' + page).classList.remove('page-hidden');
+  document.querySelectorAll('.sidebar__link').forEach(l => l.classList.remove('active'));
+  const link = document.querySelector('[data-page="' + page + '"]');
+  if(link) link.classList.add('active');
+  const titles = { dashboard:'Tableau de bord', tasks:'Liste de tâches', budget:'Budget', invites:'Invités', prestataires:'Prestataires', planning:'Planning Jour J', tables:'Plan de table', ceremony:'Cérémonie', honeymoon:'Voyage de noces' };
+  document.getElementById('pageTitle').textContent = titles[page] || page;
+  if(page === 'tasks') renderTasks('all');
+  if(page === 'budget') renderBudget();
+  if(page === 'invites') renderInvites();
+  if(page === 'prestataires') renderPrestataires();
+  if(page === 'planning') renderPlanning();
+  window.scrollTo(0,0);
+  closeSidebar();
+}
+
+// ===== SIDEBAR =====
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// ===== COUNTDOWN =====
+function updateCountdown() {
+  const target = new Date('2025-06-14T12:30:00');
+  const now = new Date();
+  const diff = target - now;
+  if(diff <= 0) { document.getElementById('daysCount').textContent = '🎉'; return; }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-days').textContent = String(d).padStart(2,'0');
+  document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-mins').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-secs').textContent = String(s).padStart(2,'0');
+  document.getElementById('daysCount').textContent = d;
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// ===== TASKS =====
+let taskFilter = 'all';
+function filterTasks(btn, filter) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTasks(filter);
+}
+function renderTasks(filter) {
+  taskFilter = filter;
+  const list = document.getElementById('taskList');
+  if(!list) return;
+  const filtered = tasks.filter(t => {
+    if(filter === 'urgent') return !t.done && t.urgent;
+    if(filter === 'done') return t.done;
+    if(filter === 'pending') return !t.done;
+    return true;
+  });
+  list.innerHTML = filtered.map(t => `
+    <div class="task-item">
+      <div class="task-check ${t.done?'done':''}" onclick="toggleTaskById(${t.id})">${t.done?'✓':''}</div>
+      <div class="task-item__content">
+        <div class="task-item__text ${t.done?'done':''}">${t.text}</div>
+        <div class="task-item__meta">${t.cat} · Avant le ${t.due}</div>
+      </div>
+      <span class="task-item__tag ${t.done?'tag--ok':t.urgent?'tag--urgent':'tag--pending'}">${t.done?'Fait':t.urgent?'Urgent':'À faire'}</span>
+    </div>
+  `).join('');
+}
+function toggleTaskById(id) {
+  const t = tasks.find(t => t.id === id);
+  if(t) { t.done = !t.done; renderTasks(taskFilter); }
+}
+function toggleTask(el) {
+  el.classList.toggle('done');
+  el.textContent = el.classList.contains('done') ? '✓' : '';
+  const textEl = el.nextElementSibling?.querySelector('.task-item__text');
+  if(textEl) textEl.classList.toggle('done');
+}
+function addTask() {
+  const input = document.getElementById('newTaskInput');
+  if(!input.value.trim()) return;
+  tasks.push({ id: Date.now(), text: input.value.trim(), cat:"Autre", due:"À définir", done:false, urgent:false });
+  input.value = '';
+  renderTasks(taskFilter);
+}
+
+// ===== BUDGET =====
+function renderBudget() {
+  const el = document.getElementById('budgetDetail');
+  if(!el) return;
+  el.innerHTML = budgetPosts.map(p => {
+    const pct = Math.min(100, Math.round(p.spent / p.budget * 100));
+    const cls = p.spent > p.budget ? 'over' : pct > 85 ? 'warn' : 'ok';
+    return `
+      <div class="budget-row">
+        <div class="budget-row__header">
+          <span class="budget-row__name">${p.name}</span>
+          <span class="budget-row__vals">${p.spent.toLocaleString('fr-FR')}€ / ${p.budget.toLocaleString('fr-FR')}€</span>
+        </div>
+        <div class="budget-bar"><div class="budget-bar__fill ${cls}" style="width:${pct}%"></div></div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== INVITES =====
+function renderInvites() {
+  const el = document.getElementById('inviteTable');
+  if(!el) return;
+  const statusLabels = { confirm:'Confirmé', pending:'En attente', decline:'Décliné' };
+  el.innerHTML = invitesData.map(i => `
+    <tr>
+      <td>${i.name}</td>
+      <td style="color:var(--ink-muted);font-size:0.8rem">${i.side}</td>
+      <td style="font-size:0.82rem">${i.table}</td>
+      <td><span class="status-dot ${i.status}"></span>${statusLabels[i.status]}</td>
+      <td style="font-size:0.82rem">${i.diet}</td>
+      <td style="font-size:0.82rem">${i.hotel}</td>
+    </tr>
+  `).join('');
+}
+
+// ===== PRESTATAIRES =====
+function renderPrestataires() {
+  const el = document.getElementById('prestatairesList');
+  if(!el) return;
+  el.innerHTML = prestataires.map(p => `
+    <div class="presta-card">
+      <div class="presta-card__top">
+        <span class="presta-card__icon">${p.icon}</span>
+        <div>
+          <div class="presta-card__name">${p.name}</div>
+          <div class="presta-card__cat">${p.cat}</div>
+        </div>
+      </div>
+      <div class="presta-card__status ${p.status}">● ${p.statusLabel}</div>
+      <div class="presta-card__price">${p.price}</div>
+      ${p.tel !== '—' ? `<div style="font-size:0.78rem;color:var(--ink-muted);margin-top:4px">📞 ${p.tel}</div>` : ''}
+      ${p.email !== '—' ? `<div style="font-size:0.78rem;color:var(--ink-muted)">✉️ ${p.email}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ===== PLANNING =====
+function renderPlanning() {
+  const el = document.getElementById('planningList');
+  if(!el) return;
+  el.innerHTML = planningJourJ.map(e => `
+    <div style="display:flex;gap:20px;padding:16px 0;border-bottom:1px solid rgba(200,169,110,0.1);align-items:flex-start">
+      <div style="min-width:52px;font-family:var(--font-serif);font-size:1.1rem;color:var(--gold-dark);font-weight:600">${e.time}</div>
+      <div>
+        <div style="font-size:0.92rem;font-weight:500;color:var(--ink)">${e.event}</div>
+        <div style="font-size:0.78rem;color:var(--ink-muted);margin-top:2px">👤 ${e.who}</div>
+      </div>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>

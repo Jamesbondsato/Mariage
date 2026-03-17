@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /pages/app.html
+Disallow: /pages/connexion.html
+Disallow: /pages/inscription.html
+Disallow: /mon-espace/
+
+Sitemap: https://monmariageparfait.fr/sitemap.xml
+
+# Performance hint
+Crawl-delay: 2
